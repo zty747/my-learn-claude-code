@@ -1,0 +1,75 @@
+我的学习记录
+看1.learn-claude-code   找Claude视频  看小林文档
+
+我觉得basics_overall.ipynb甚至整个D:\RL\agent\modern_genai_bilibili\agents太跳跃了 不够基础
+我想先学习D:\RL\学习记录\modern_agent\learn-claude-code 但是我还是先了解生态位和claude-code的多层架构 你有什么具体建议
+
+
+确定教材  生态位+架构（不仅仅只是类CRUD数据流先后，可能像公司中各个部门）  学习手段（包含笔记）
+
+
+
+
+我看了README-zh.md + s20_comprehensive/README.md  后者概念太跳脱了
+
+问codex：Claude Code 在模型、API、文件系统、shell、git、用户之间的位置 这张图你可以帮我画一下吗？用你觉得尽量清晰的方式，在D:\RL\学习记录\modern_agent\learn-claude-code\pic下添加
+
+
+我开始学习s01 发现有图 我看看是补细节（代码细节还是数据具体内容）
+我发现代码不太能看得懂，让Gemini给我推演代码介绍流程和细节+实例分析获取形状
+问Gemini：
+给我详细分析一下下面的代码做了什么，有以下规则：
+1.不要跳过任意一条代码，但是分析中不必出现具体代码，你要将其转换为业务逻辑，说明其做了什么事情
+2.要理清条件分支，比如加法减法乘法
+3.应该在这个过程抓住一个或几个对象的生命周期，如history又是怎么变化的
+4.调用的自定义函数页要按上面的方法展开分析如run_bash如果代码中有较详细的注释可以简单一点
+我对subprocess.run的来源，作用都不太理解，请重点介绍
+
+我对着逻辑去看代码  打分3/10 只是对subprocess.run清晰了
+
+问Gemini：
+仔细分析代码，我想问 会把下面的prompt变成怎么样的结构？我还要你给我推演一下其它主要数据结构具体的实际内容 ，拿1. `Create a file called hello.py that prints "Hello, World!"`
+
+2. `List all Python files in this directory`
+
+3. `What is the current git branch?`分别推演一下
+
+非常满意，打分8/10 得到了如
+![[Pasted image 20260527153208.png]]
+的细节 ==意识到高质量例子的重要性 也意识到我可以把这些学习手段总结当成我的tool==
+
+回填环节：把细节填入流程图
+
+输出环节：略 后面合适地方看看
+
+问Gemini(这里我补了S01问题的部分以及与真实cc的比较推演)：
+s02
+仔细分析下面代码，先给我介绍 safe_path，**Zod schema 验证**，**工具级 validateInput()**，**PreToolUse hooks**，**权限检查**，StreamingToolExecutor，maxResultSizeChars，partitionToolCalls() 的来源，作用 。然后我想问在新版的代码中 会把下面的prompt变成怎么样的结构？我还要你给我推演一下其它主要数据结构具体的实际内容 ，拿1. `Read the file README.md and tell me what this project is about`
+2. `Create a file called test.py that prints "hello", then read it back`
+3. `Find all Python files in this directory`
+4. `Read both README.md and requirements.txt, then create a summary file` 分别推演一下
+然后讲解推演时对于 如果涉及到 上面提到的内容要把我的代码和真实cc的进行对比推演，也就是分别展示我版本和cc版本主要数据结构具体的实际内容 cc版本差异如下：
+
+我觉得我要重点了解maxResultSizeChars 这种解决大文件的方法
+没想到看到下面的清晰了非常满意，打分8.5/10  认可这种反馈Saved full output to /tmp/xxx.txt来实现按需调用的方式
+![[Pasted image 20260527162647.png]]
+缺点是只讲明了safe_path，Zod schema 验证作用，没有讲明白代码/逻辑实现
+
+我觉得“分别展示我版本和cc版本主要数据结构具体的实际内容”非常棒 但是要需要恰当的prompt例子来踩到他们的差异点 
+
+问Gemini：
+很好，现在请你介绍一下safe_path，Zod schema，validateInput()，PreToolUse hooks的代码或者逻辑实现，他们是如何实现你提到的作用的
+7/10
+
+还是得好好学学后端 不太懂接口，implement ，AOP这些的
+好像有点懂了 PreToolUse hooks的逻辑也有点懂 但是可能还是要代码级的例子串起来 
+
+
+
+回填环节：把细节填入流程图
+明天问：cc要判断工具是否可以并行调用以及决定顺序根据读写冲突和读写依赖（如读a文件后写总结到b文件）把掉用分为不同顺序的几批 这个分批是isConcurrencySafe和partitionToolCalls()完成吗 拿这种读a文件后写总结到b文件 是输出工具调用那段文字的模型 判断 b写要在a读之后执行 的吗 还是有另外的排序措施
+
+
+
+输出环节：略 后面合适地方看看
+

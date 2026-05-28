@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#15803d"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .title { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 34px; font-weight: 700; fill: #0f172a; }
+      .subtitle { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 17px; fill: #475569; }
+      .section { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 24px; font-weight: 700; fill: #0f172a; }
+      .label { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 18px; font-weight: 700; fill: #0f172a; }
+      .small { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 15px; fill: #334155; }
+      .tiny { font-family: "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; font-size: 13px; fill: #475569; }
+      .mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 14px; fill: #334155; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 16; filter: url(#shadow); }
+      .soft { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; rx: 14; }
+      .blue { fill: #eff6ff; stroke: #60a5fa; stroke-width: 2; rx: 14; }
+      .green { fill: #f0fdf4; stroke: #4ade80; stroke-width: 2; rx: 14; }
+      .orange { fill: #fff7ed; stroke: #fb923c; stroke-width: 2; rx: 14; }
+      .purple { fill: #faf5ff; stroke: #c084fc; stroke-width: 2; rx: 14; }
+      .line { stroke: #334155; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .lineBlue { stroke: #2563eb; stroke-width: 2.5; fill: none; marker-end: url(#arrowBlue); }
+      .lineGreen { stroke: #15803d; stroke-width: 2.5; fill: none; marker-end: url(#arrowGreen); }
+      .dash { stroke: #64748b; stroke-width: 2; stroke-dasharray: 8 8; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="900" fill="#f1f5f9"/>
+
+  <text x="70" y="66" class="title">Claude Code 的生态位：模型与工程环境之间的 Harness</text>
+  <text x="72" y="100" class="subtitle">模型负责推理和决策；Claude Code 负责把上下文、工具、权限和执行结果组织成可工作的闭环。</text>
+
+  <!-- Left: user side -->
+  <rect x="70" y="165" width="250" height="470" class="box"/>
+  <text x="105" y="208" class="section">用户侧</text>
+  <rect x="100" y="240" width="190" height="72" class="soft"/>
+  <text x="125" y="270" class="label">用户目标</text>
+  <text x="125" y="295" class="small">修 bug / 加功能 / 解释代码</text>
+  <rect x="100" y="335" width="190" height="72" class="soft"/>
+  <text x="125" y="365" class="label">交互输入</text>
+  <text x="125" y="390" class="small">自然语言 + 反馈 + 确认</text>
+  <rect x="100" y="430" width="190" height="72" class="soft"/>
+  <text x="125" y="460" class="label">项目意图</text>
+  <text x="125" y="485" class="small">需求、边界、偏好、验收</text>
+  <rect x="100" y="525" width="190" height="72" class="orange"/>
+  <text x="125" y="555" class="label">最终产物</text>
+  <text x="125" y="580" class="small">改动、测试结果、总结</text>
+
+  <!-- Center: Claude Code -->
+  <rect x="410" y="145" width="570" height="530" class="box"/>
+  <text x="455" y="188" class="section">Claude Code Harness</text>
+  <text x="455" y="218" class="subtitle">让模型能在代码仓库中观察、行动、记忆和受控执行</text>
+
+  <rect x="455" y="250" width="220" height="82" class="blue"/>
+  <text x="482" y="280" class="label">上下文组装</text>
+  <text x="482" y="306" class="small">system prompt / CLAUDE.md</text>
+  <text x="482" y="326" class="small">skills / memory / history</text>
+
+  <rect x="715" y="250" width="220" height="82" class="blue"/>
+  <text x="742" y="280" class="label">Agent Loop</text>
+  <text x="742" y="306" class="mono">LLM -> tool_use</text>
+  <text x="742" y="326" class="mono">tool_result -> LLM</text>
+
+  <rect x="455" y="365" width="220" height="82" class="green"/>
+  <text x="482" y="395" class="label">工具分发</text>
+  <text x="482" y="421" class="small">bash / read / write / edit</text>
+  <text x="482" y="441" class="small">git / browser / MCP</text>
+
+  <rect x="715" y="365" width="220" height="82" class="green"/>
+  <text x="742" y="395" class="label">权限与边界</text>
+  <text x="742" y="421" class="small">sandbox / approval</text>
+  <text x="742" y="441" class="small">路径、命令、危险操作</text>
+
+  <rect x="455" y="480" width="220" height="82" class="purple"/>
+  <text x="482" y="510" class="label">计划与任务</text>
+  <text x="482" y="536" class="small">todo / task graph</text>
+  <text x="482" y="556" class="small">subagent / background</text>
+
+  <rect x="715" y="480" width="220" height="82" class="purple"/>
+  <text x="742" y="510" class="label">上下文压缩</text>
+  <text x="742" y="536" class="small">micro compact / auto compact</text>
+  <text x="742" y="556" class="small">长任务持续工作</text>
+
+  <rect x="515" y="595" width="360" height="48" fill="#0f172a" rx="12"/>
+  <text x="545" y="625" style="font-family:'Microsoft YaHei','Noto Sans CJK SC',Arial,sans-serif;font-size:18px;font-weight:700;fill:#fff;">核心：一个循环，周围挂载 harness 机制</text>
+
+  <!-- Right: environment -->
+  <rect x="1080" y="165" width="250" height="470" class="box"/>
+  <text x="1115" y="208" class="section">工程环境</text>
+  <rect x="1110" y="240" width="190" height="72" class="soft"/>
+  <text x="1135" y="270" class="label">文件系统</text>
+  <text x="1135" y="295" class="small">读写源码、配置、文档</text>
+  <rect x="1110" y="335" width="190" height="72" class="soft"/>
+  <text x="1135" y="365" class="label">Shell</text>
+  <text x="1135" y="390" class="small">运行命令、构建、测试</text>
+  <rect x="1110" y="430" width="190" height="72" class="soft"/>
+  <text x="1135" y="460" class="label">Git</text>
+  <text x="1135" y="485" class="small">diff、branch、commit、PR</text>
+  <rect x="1110" y="525" width="190" height="72" class="soft"/>
+  <text x="1135" y="555" class="label">外部系统</text>
+  <text x="1135" y="580" class="small">浏览器、MCP、API、CI</text>
+
+  <!-- Bottom model/API -->
+  <rect x="410" y="735" width="570" height="95" class="box"/>
+  <text x="455" y="775" class="section">模型 / API 层</text>
+  <text x="455" y="805" class="small">Claude 模型提供推理、规划、代码理解；Messages API 承载 messages、tools、tool_use、tool_result。</text>
+
+  <!-- Arrows -->
+  <path d="M 320 380 C 355 380, 370 380, 410 380" class="lineBlue"/>
+  <text x="333" y="355" class="tiny">用户请求</text>
+
+  <path d="M 980 380 C 1020 380, 1038 380, 1080 380" class="lineGreen"/>
+  <text x="1005" y="355" class="tiny">执行动作</text>
+
+  <path d="M 1080 500 C 1038 500, 1020 500, 980 500" class="line"/>
+  <text x="995" y="535" class="tiny">观察结果</text>
+
+  <path d="M 410 560 C 370 560, 355 560, 320 560" class="line"/>
+  <text x="335" y="595" class="tiny">阶段性回复 / 最终总结</text>
+
+  <path d="M 695 735 L 695 676" class="lineBlue"/>
+  <text x="710" y="715" class="tiny">API 调用</text>
+  <path d="M 760 676 L 760 735" class="line"/>
+  <text x="775" y="715" class="tiny">模型响应</text>
+
+  <!-- Lifecycle strip -->
+  <rect x="70" y="700" width="250" height="130" class="soft"/>
+  <text x="98" y="733" class="label">一次任务的消息流</text>
+  <text x="98" y="764" class="mono">user: 目标</text>
+  <text x="98" y="789" class="mono">assistant: tool_use</text>
+  <text x="98" y="814" class="mono">user: tool_result</text>
+  <text x="98" y="839" class="mono">assistant: 继续/结束</text>
+
+  <rect x="1080" y="700" width="250" height="130" class="soft"/>
+  <text x="1110" y="733" class="label">职责边界</text>
+  <text x="1110" y="764" class="small">模型：判断下一步做什么</text>
+  <text x="1110" y="789" class="small">Harness：给上下文和工具</text>
+  <text x="1110" y="814" class="small">环境：产生真实副作用</text>
+  <text x="1110" y="839" class="small">用户：给目标和验收</text>
+
+  <!-- Inner loop arrows -->
+  <path d="M 670 292 C 690 275, 710 275, 715 292" class="dash"/>
+  <path d="M 825 332 C 850 350, 850 365, 825 365" class="dash"/>
+  <path d="M 715 406 C 695 425, 675 425, 675 406" class="dash"/>
+  <path d="M 565 365 C 545 350, 545 332, 565 332" class="dash"/>
+</svg>
