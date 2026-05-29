@@ -67,9 +67,94 @@ s02
 
 
 回填环节：把细节填入流程图
-明天问：cc要判断工具是否可以并行调用以及决定顺序根据读写冲突和读写依赖（如读a文件后写总结到b文件）把掉用分为不同顺序的几批 这个分批是isConcurrencySafe和partitionToolCalls()完成吗 拿这种读a文件后写总结到b文件 是输出工具调用那段文字的模型 判断 b写要在a读之后执行 的吗 还是有另外的排序措施
+明天问：cc要判断工具是否可以并行调用以及决定顺序根据读写冲突和读写依赖（如读a文件后写总结到b文件）把掉用分为不同顺序的几批 这个分批是isConcurrencySafe和partitionToolCalls()完成吗  这种读a文件后写总结到b文件 是输出工具调用那段文字的模型 判断 b写要在a读之后执行 的吗 还是有另外的排序措施
+8/10
+回答非常满意
+![[Pasted image 20260528100700.png]]
+
+“你提到的这个经典场景：**“读 A 文件，然后把 A 的总结写到 B 文件中”**。
+在实际的 Agent 运行中，大模型绝不会（也不可能）在同一个输出批次里同时给出这两个工具调用。因为这里存在一个逻辑上的“时间悖论”：大模型在没有真正拿到 A 文件的内容之前，是不可能凭空写出关于 A 的正确总结的。
+因此，这种存在**强数据依赖**的操作，是被大模型通过多回合对话（Multi-turn Conversational RPC）来解决的，而不是靠框架的并发调度器来解决。”
 
 
+输出环节：细节访问就是上面的  流程总结后面合适地方看看
 
-输出环节：略 后面合适地方看看
+先看项目readme （了解了cc的特点，知道要重点问什么），再问
+概念不清晰：hook 因为之前的课程要么之前学过类似的要么很明确作用
+问Gemini(这里我补了S01问题的部分+s02修正以及只有真实cc的比较推演)：
+S03+s04
+仔细分析下面代码，先给我详细介绍一下hook的来源，作用，代码/逻辑实现，我之前学过vue中有各种生命周期钩子，可以用这个类比介绍。然后介绍一下cc中的27 个 hook 事件的逻辑含义，`HookResult`的常用字段， Hook 'allow'， stopHookActive 机制， hook_stopped_continuation，CC 的 `PermissionResult` 的4 个 behavior，CC 来自 8 个来源权限规则 
 
+然后我想问在下面的代码中 会把下面的prompt变成怎么样的结构？我还要你给我推演一下其它主要数据结构具体的实际内容 ，拿
+1. `Read the file README.md`（应该直接通过，观察 hook 日志）
+2. `Create a file called test.txt`（通过后观察 PostToolUse 是否触发）
+3. `Delete all temporary files in /tmp`（bash + rm 触发权限 hook）
+分别推演一下
+然后讲解推演时对于 如果涉及到 上面提到的内容要把我的代码和真实cc的进行对比推演，也就是分别展示我版本和cc版本主要数据结构具体的实际内容 cc版本差异如下：
+
+
+反馈：
+1Q.我明白了Hook 的作用就是“在不修改主流程代码的前提下，在特定生命周期节点动态注入自定义逻辑”，那如何确定处于哪个生命周期节点？是在生命周期对应程序段埋入hook吗
+
+1A.我自己回看readme中的介绍明白了，没有问Gemini。 是的，是在生命周期对应程序段埋入trigger_hooks。如根据代码逻辑==人为==确定UserPromptSubmit位置（所以也是高度自定义）：
+```python
+query = input("s04 >> ")
+trigger_hooks("UserPromptSubmit", query)   # ← 进入 LLM 之前，就是UserPromptSubmit
+history.append({"role": "user", "content": query})
+agent_loop(history)
+```
+然后写自定义钩子函数，绑定到对应生命周期节点上：
+```python
+def context_inject_hook(query: str) -> str | None:
+    """Inject current working directory info into every prompt."""
+    print(f"\033[90m[HOOK] UserPromptSubmit: working in {WORKDIR}\033[0m")
+    return None   # return None = no modification, let prompt through
+
+register_hook("UserPromptSubmit", context_inject_hook)
+```
+下面是hook的数据结构，看看register_hook和trigger_hooks就对挂载和触发非常清晰了
+```python
+HOOKS = {
+    "UserPromptSubmit": [],
+    "PreToolUse": [],
+    "PostToolUse": [],
+    "Stop": [],
+}
+
+def register_hook(event: str, callback):
+    HOOKS[event].append(callback)
+
+def trigger_hooks(event: str, *args):
+    for callback in HOOKS[event]:
+        result = callback(*args)
+        if result is not None:   # 返回值 ≠ None → hook 说"停"
+            return result
+    return None
+```
+接着我觉得细节就是返回值了（好吧，不仅如此，还有trigger_hooks函数的设计好）
+这一部分Gemini没有详细推演好，比如trigger_hooks("PostToolUse", block, output)中block, output的传参数据流
+在toy版中的PostToolUse阶段，trigger_hook通过callback( * args) 把block和output传入large_output_hook来实现功能 关于TOOL_HANDLERS block见思维导图推演
+```python
+def large_output_hook(block, output):
+    """PostToolUse: warn on large output."""
+    if len(str(output)) > 100000:
+        print(f"\033[33m[HOOK] ⚠ Large output from {block.name}: {len(str(output))} chars\033[0m")
+    return None
+
+register_hook("PostToolUse", large_output_hook)
+
+   handler = TOOL_HANDLERS.get(block.name)
+   output = handler(**block.input) if handler else f"Unknown: {block.name}"
+   trigger_hooks("PostToolUse", block, output)  # s04: post hook
+   results.append({"type": "tool_result", "tool_use_id": block.id, "content": output})
+
+```
+to Gemini：请你详细推演一下这段的代码，举一个实例推演主要数据结构，粒度以代码或代码块为单位，不要跳过任何一条代码
+
+非常清晰 8.5/10
+
+
+回填：把细节填入流程图
+
+
+输出：
