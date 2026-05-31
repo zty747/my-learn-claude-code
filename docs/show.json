@@ -1,0 +1,11 @@
+[
+  {"role": "user", "content": "Use a subtask to find what testing framework..."}
+]
+// 随后追加:
+[
+  {"type": "tool_use", "id": "t_01", "name": "task", "input": {"description": "Find testing framework..."}}
+]
+// 最终收到子 Agent 纯文本:
+[
+  {"type": "tool_result", "tool_use_id": "t_01", "content": "This project uses pytest. Found in pyproject.toml."}
+]
