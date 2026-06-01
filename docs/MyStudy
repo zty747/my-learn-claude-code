@@ -203,3 +203,23 @@ to Gemini：我觉得学术化很重要 比如把LLM返回的根据调用叫做R
 to Gemini：对于真实 CC (V2 依赖树) 的差异推演中， 文件持久化（Claude 配置目录下 tasks/{taskListId}/{taskId}.json）是如何实现的？llm读取计划是：user返回给llmtodo文件路径，llm再调用read工具读，函数直接把todojson文件内容发给llm？
 
 输出：
+S06
+先看项目readme （了解了cc的特点，知道要重点问什么），再问
+问codex：
+仔细分析代码D:\RL\学习记录\modern_agent\my-learn-claude-code\s06_subagent\code.py和文档D:\RL\学习记录\modern_agent\my-learn-claude-code\s06_subagent\README.md，
+
+先给我详细介绍一下CC中的
+Context Isolation 的精确粒度，createSubagentContext()，abortController，setAppState，readFileState，queryTracking
+
+的来源和作用以及代码或逻辑实现
+然后我想问在下面的代码中 会把下面的prompt变成怎么样的结构？注意千万不要实际执行 ，我只要你推测 我还要你给我推演一下其它主要数据结构具体的实际内容如message ，拿
+1. `Use a subtask to find what testing framework this project uses`（子 Agent 去读文件，主 Agent 只收结论）
+2. `Delegate: read all .py files in agents/ and summarize what each one does`
+3. `Use a task to create s06_subagent/example/string_tools.py with a slugify(text: str) function, then verify it from the parent agent`
+分别推演一下 
+观察重点：是否出现 `[Subagent spawned]` / `[Subagent done]`？子 Agent 的工具调用是否以 `[sub] ...` 输出？主 Agent 最后是否只继续处理子 Agent 返回的摘要？
+
+然后讲解推演时对于 如果涉及到 下面提到的CC内容要把我的代码和真实cc的两种方式进行对比推演，也就是分别展示我版本和cc版本主要数据结构具体的实际内容 cc版本差异如下：
+
+Gemini的解释概念要比codex清晰易懂 但是codex例子完整一点（但是没有展现CC版本数据结构）
+反馈：主agent创建subagent后是一直等subagent的信息介入吗
