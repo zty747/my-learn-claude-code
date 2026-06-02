@@ -14,3 +14,36 @@
 {"type": "tool_use", "id": "toolu_create", "name": "task",
  "input": {"description": "Create s06_subagent/example/string_tools.py
   with a slugify(text: str) function. Return what you changed."}}
+
+
+
+  [
+  {"role": "user", "content": "Load the code-review skill and follow its instructions"},
+  {"role": "assistant", "content": [
+    {"type": "tool_use", "id": "toolu_1", "name": "load_skill", "input": {"name": "code-review"}}
+  ]},
+  {"role": "user", "content": [
+    {"type": "tool_result", "tool_use_id": "toolu_1", "content": "<完整 code-review/SKILL.md 原文>"}
+  ]},
+  {"role": "assistant", "content": [
+    {"type": "text", "text": "I’ve loaded the code-review skill. I’ll follow its checklist: security,
+     correctness, performance, maintainability, and testing. Please provide the code or diff to review."}
+  ]}
+]
+
+
+[
+  {"role": "user", "content": "Load the code-review skill and follow its instructions"},
+  {"role": "assistant", "content": [
+    {"type": "tool_use", "id": "toolu_1", "name": "load_skill", "input": {"name": "code-review"}}
+  ]},
+// 2. CC 底层拦截并组装 (非常精妙的设计)
+// tool_result 很轻量：
+{"type": "tool_result", "tool_use_id": "t_01", "content": "Launching skill: code-review"}
+// 但系统会在这之后静默插入一条 newMessages 供 LLM 阅读：
+{"role": "user", "content": "System injected skill context: <完整 code-review/SKILL.md 原文>"}
+  {"role": "assistant", "content": [
+    {"type": "text", "text": "I’ve loaded the code-review skill. I’ll follow its checklist: security,
+     correctness, performance, maintainability, and testing. Please provide the code or diff to review."}
+  ]}
+]
