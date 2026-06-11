@@ -476,8 +476,18 @@ messages = [
 回填：先看readme在填图也可以 这里感觉codex没有把contextCollapse cache_edits解释好 先进入S09好了
 
 
-S09
+S09  一周没学 看不出反馈了 先问下面这些
 
+仔细分析代码D:\RL\学习记录\modern_agent\my-learn-claude-code\s09_memory\code.py和文档D:\RL\学习记录\modern_agent\my-learn-claude-code\s09_memory\README.md，
+
+我想问在下面的代码中 会把下面的prompt变成怎么样的结构？注意千万不要实际执行 ，我只要你推测 我还要你给我推演一下其它主要数据结构具体的实际内容如message ，拿（分多轮输入，观察记忆的累积和加载）下面的prompt推演一下
+1. `I prefer using tabs for indentation, not spaces. Remember that.`
+2. `Create a Python file called test.py`（观察 Agent 是否用了 tab）
+3. `What did I tell you about my preferences?`（观察 Agent 是否记得）
+4. `I also prefer single quotes over double quotes for strings.`
+观察重点：每轮结束后是否出现 `[Memory: extracted N new memories]`？`.memory/` 目录下是否生成了 `.md` 文件？`MEMORY.md` 索引是否更新？新一轮对话时 Agent 是否自动加载了之前的记忆？
+
+然后讲解推演时对于 如果涉及到 下面提到的CC内容要把我的代码和真实cc的两种方式进行对比推演，也就是分别展示我版本和cc版本主要数据结构具体的实际内容
 
 反馈：
 `extract_memories()` 在每轮结束时运行，条件是模型停止且没有 tool_use（说明对话告一段落）
