@@ -553,6 +553,20 @@ def extract_memories(messages: list):
     except Exception:
         pass
 
+```python
+def load_memories(messages: list) -> str:
+    """Load relevant memory content for injection into context."""
+    selected_files = select_relevant_memories(messages)
+    if not selected_files:
+        return ""
+    parts = ["<relevant_memories>"]
+    for filename in selected_files:
+        content = read_memory_file(filename)
+        if content:
+            parts.append(content)
+    parts.append("</relevant_memories>")
+    return "\n\n".join(parts)
+```
 
 回填：
 
