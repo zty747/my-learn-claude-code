@@ -491,6 +491,67 @@ S09  一周没学 看不出反馈了 先问下面这些
 
 反馈：
 `extract_memories()` 在每轮结束时运行，条件是模型停止且没有 tool_use（说明对话告一段落）
+extract_memories()不是tool_use，表明应该不是本地执行？不一定 可能是默认固定执行，就像hook函数一样是本地但是不是按需执行，所以不是tool
+补：tool和skill都是按需 我觉得区别侧重在返回的内容上，skill返回的prompt类的规范指导，tool返回的是llm要的结果，一个是本地指导LLM，一个是LLM指导本地或者说LLM自身发挥。所以我感觉skill比较能体现harness
+```python
+def extract_memories(messages: list):
+    """Extract new memories from recent dialogue. Runs after each turn."""
+    # Collect recent conversation text
+    dialogue_parts = []
+    for msg in messages[-10:]:
+        role = msg.get("role", "?")
+        content = msg.get("content", "")
+        if isinstance(content, list):
+            content = " ".join(
+                str(getattr(b, "text", "")) for b in content
+                if getattr(b, "type", None) == "text"
+            )
+        if isinstance(content, str) and content.strip():
+            dialogue_parts.append(f"{role}: {content}")
+    dialogue = "\n".join(dialogue_parts)
+    if not dialogue.strip():
+        return
+    # Check existing memories to avoid duplicates
+    existing = list_memory_files()
+    existing_desc = "\n".join(f"- {m['name']}: {m['description']}" for m in existing) if existing else "(none)"
+    prompt = (
+        "Extract user preferences, constraints, or project facts from this dialogue.\n"
+        "Return a JSON array. Each item: {name, type, description, body}.\n"
+        "- name: short kebab-case identifier (e.g. 'user-preference-tabs')\n"
+        "- type: one of 'user' (user preference), 'feedback' (guidance), "
+        "'project' (project fact), 'reference' (external pointer)\n"
+        "- description: one-line summary for index lookup\n"
+        "- body: full detail in markdown\n"
+        "If nothing new or already covered by existing memories, return [].\n\n"
+        f"Existing memories:\n{existing_desc}\n\n"
+        f"Dialogue:\n{dialogue[:4000]}"
+    )
+    try:
+        response = client.messages.create(
+            model=MODEL, messages=[{"role": "user", "content": prompt}], max_tokens=800
+        )
+        text = response.content[0].text.strip()
+
+        # Extract JSON array from response
+        match = re.search(r'\[.*\]', text, re.DOTALL)
+        if not match:
+            return
+        items = json.loads(match.group())
+        if not items:
+            return
+        count = 0
+        for mem in items:
+            name = mem.get("name", f"memory_{int(time.time())}")
+            mem_type = mem.get("type", "user")
+            desc = mem.get("description", "")
+            body = mem.get("body", "")
+            if desc and body:
+                write_memory_file(name, mem_type, desc, body)
+                count += 1
+        if count:
+            print(f"\n\033[33m[Memory: extracted {count} new memories]\033[0m")
+    except Exception:
+        pass
 
 
 回填：
