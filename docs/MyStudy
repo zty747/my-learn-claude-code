@@ -575,6 +575,7 @@ def extract_memories(messages: list):
 **关键条件**：==只有当 `desc` 和 `body` **都不为空**时，才调用 `write_memory_file` 写入磁盘。如果某条记忆的摘要或正文为空，则认为无效，跳过。==
 
 
+
 ```python
 def load_memories(messages: list) -> str:
     """Load relevant memory content for injection into context."""
@@ -739,6 +740,24 @@ def consolidate_memories():
 ==- 优先保留重要的用户偏好。==
 ==- 返回格式与提取记忆时的 JSON 数组相同==
 注意 `catalog` 被截断到前 16000 字符，防止超出 token 限制。
+
+
+to gemini:
+给我介绍一下数据进入client.messages.create前的流转，我关心的是是messages,systems prompt，目录memory.md和许多记忆md文件在这个阶段 数据结构如何变化流转被函数调用
+
+根据extract_memories，select_relevant_memories阶段发给LLM 的filename, name, description, type, body是不是就是一个md的完整内容？这和load_memories的read_memory_file(filename) 读取具体的 .md 文件内容是不是一样？
+
+==`select_relevant_memories` 和 `extract_memories` (只给 LLM 看摘要)
+虽然代码在内存里加载了包含完整 `body` 的字典列表，但在组装 Prompt 发给大模型时，**故意把最占长度的 `body` 丢弃了**。==
+
+
+
+我注意到S09版本
+
+1.extract_memories关注最近 10 条消息，那在多轮对话时会不会重复从几段对话中提取记忆？ 
+2.
+真实CC解决了吗 是如何解决的
+
 
 回填：
 
