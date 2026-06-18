@@ -750,24 +750,98 @@ to gemini:
 ==`select_relevant_memories` 和 `extract_memories` (只给 LLM 看摘要)
 虽然代码在内存里加载了包含完整 `body` 的字典列表，但在组装 Prompt 发给大模型时，**故意把最占长度的 `body` 丢弃了**。==
 
-
+1.extract_memories关注最近 10 条消息，那在多轮对话时会不会重复从某段message中提取记忆？ 
+已解决 有extract_memories会在prompt加Existing memories:
+==对比学习：memories和skill挺像，都是把name，describe等简单信息注入system prompt 让LLM决定加载然后读取完整信息，区别是memories决定加载哪个是由小模型决定的，我觉得可能是由于memories是一定调用用小模型节省成本，而skill不一定调用所以用大模型  。然后skill没有一个像MEMORY.md的东西 ,这里我好奇MEMORY.md的作用，在小模型提取几段具体记忆后发给大模型后 ，为什么还要把完整的目录 MEMORY.md 发给大模型 是不是怕小模型截断10条信息提取的不全，大模型发现还需要MEMORY.md中有但是<relevant_memories>无的内容还能不能再取？  在CC中又是怎么样？==
 
 我注意到S09版本
 
-1.extract_memories关注最近 10 条消息，那在多轮对话时会不会重复从几段对话中提取记忆？ 
-2.
+
+1.代码逻辑是messages兵分两路，一路和配合MEMORY.md和去掉去掉body的具体记忆md文件选出 完整带有body的具体记忆md文件内容 来添加到system prompt，另一路经过压缩管线，我的说法对吗？真实cc是不是这样？
+2.这里和cc中的MEMORY.md和具体记忆md文件 是不是跨窗口的，我注意到在S09他们位于./memory目录上
+3.对比学习：memories和skill挺像，都是把name，describe等简单信息注入system prompt 让LLM决定加载然后读取完整信息，区别是memories决定加载哪个是由小模型决定的，我觉得可能是由于memories是一定调用用小模型节省成本，而skill不一定调用所以用大模型  。然后skill没有一个像MEMORY.md的东西 ,这里我好奇MEMORY.md的作用，在小模型提取几段具体记忆后发给大模型后 ，为什么还要把完整的目录 MEMORY.md 发给大模型 是不是怕小模型截断10条信息提取的不全，大模型发现还需要MEMORY.md中有但是<relevant_memories>无的内容还能不能再取？最后 加载完整skill是一个agent loop而加载完整memory不是，是委托别的模型进行  在CC中又是怎么样？
+我的说法对吗
+4.用户一次输入可能触发多次agent loop,结束标志是不工具调用，那是不是每个agent loop都要分析是否调用skill，load memory，压缩这些，压缩我可以理解，有的时候agent loop是调用loadskill或者read_file,这样也要重新调模型判断读memory 会不会很浪费 也就是用户一次输入调用了很多小模型来判断读哪些记忆文件  真实cc是怎么样
+5.extract_memories(pre_compress) ，如果用户一次输入触发多次agent loop，这个pre_compress是不是就是仅没有经过最后一次agent loop的压缩和回答的messages？
+
 真实CC解决了吗 是如何解决的
 
+关于用户一次输入触发多次while true，在教学版本中，是不是会重复触发system = build_system()
+memories_content = load_memories(messages)  ，比如一次用户输入触发 5 次工具循环，教学版可能做 5 次 memory selection。这样是不是不仅浪费，如果memory选取不同，还会导致kvcache匹配不上
+此外，相邻的while true区别是不是就是messages不同？
+此外，你提到的
+```ts
+onUserTurnStart:
+  memoryPrefetchPromise = findRelevantMemories(query, catalog)
+
+beforeOrDuringModelCall:
+  if ready:
+    attach selected memories
+  else:
+    continue without blocking or collect later
+```
+可以通俗的给我讲讲代码逻辑吗？CC是如何解决memory选取不同kvcache命中的问题
+
+
+真实cc中“每轮用户 turn 开始时，`query.ts:301-304` 启动 memory prefetch（异步）；工具执行后 `1592-1614` 非阻塞收集结果，不卡主流程。”我对非阻塞收集结果，不卡主流程很好奇，拿到的记忆时，如何塞进主LLM的上下文？是不一定在第一次而是在某一次while true加入system prompt吗？这样会不会使得主模型第一次没有拿到记忆而产生误判？
+answer
+在CC中，不会让主 Agent 每次工具循环都停下来问“这轮该加载哪些记忆”，而是在用户刚发消息时，就派一个旁路小助手提前查。关键点是：这个查询是按用户 turn 启动的，不是每个 tool loop 都重新启动。查 memory 的 side-query 在后台跑；
+主 agent loop 不等它；每次要发下一次主模型请求while true时，看看结果是否已经 ready；ready 就附加，不 ready 就继续。非阻塞 memory prefetch 可能导致第一次主模型调用没拿到完整 memory。CC 接受这个风险，因为阻塞等待每次 memory side-query 会显著拖慢 agent。
+==MEMORY.md / memory prompt 的轻量索引或行为指令相对稳定，可能已在上下文里 MEMORY.md的索引name+describe有时就能传达信息==
+
+此外 session memory是什么？D:\RL\学习记录\modern_agent\my-learn-claude-code\s09_memory\README.md和D:\RL\学习记录\modern_agent\my-learn-claude-code\s08_context_compact\README.md都有提到session memory和sessionMemoryCompact但是都没有讲明白其具体机制，你可以给我介绍一下吗
+![[Pasted image 20260617234938.png]]
+
+==session memory是通过LLM总结的吗？是在什么时期总结，如果你不确定，可以搜索一下，就是在services/SessionMemory/sessionMemory.ts==
+具体见codex
+![[Pasted image 20260617235912.png]]
+
+给我介绍一下prompt cache，这个和kvcache有什么区别？是由类似vllm这种推理框架负责的吗
+
+”服务端可能把 P 或更长前缀缓存下来“这里存的是是什么？是p每个token经过注意力和mlp后的向量吗？
+不是主要存“经过注意力和 MLP 后的向量”；
+更可能存“每层 attention 所需的 K/V 张量”，也就是 prefill 后的 prefix KV 状态。
+如果kvcache特指单次decode不包含会话复用 这个那nanovllm的机制就实现kvcache和prompt cache
 
 回填：
-
-
 
 
 S10
-反馈：
-回填：
+仔细分析代码D:\RL\学习记录\modern_agent\my-learn-claude-code\s10_system_prompt\code.py和文档D:\RL\学习记录\modern_agent\my-learn-claude-code\s10_system_prompt\README.md，先给我详细介绍一下CC中的 **静态 section**（始终加载）：identity、system、doing_tasks、actions、using_tools、tone_style、output_efficiency 等。
 
+**动态 section**（按状态加载）：session_guidance、memory、ant_model_override、env_info_simple、language、output_style、mcp_instructions、scratchpad、frc、summarize_tool_results、numeric_length_anchors、token_budget、brief 等的概念以及CC 的三层缓存：
+
+1. **lodash memoize**：`getSystemContext` 和 `getUserContext` 在会话中缓存（`context.ts`）
+2. **section 注册缓存**：`STATE.systemPromptSectionCache` 缓存动态 section 结果，`/clear` 或 `/compact` 时清除
+3. **API 级缓存**：`splitSysPromptPrefix()`（`api.ts`）把 prompt 按 boundary 分成不同 cache scope 的块
+的代码逻辑
+
+我想问在下面的代码中 会把下面的prompt变成怎么样的结构？注意千万不要实际执行 ，我只要你推测 我还要你给我推演一下其它主要数据结构具体的实际内容如messages，拿
+1. `Read the file README.md`（观察始终加载的三个 section）
+2. `Create a file called .memory/MEMORY.md with content "- [test](test.md) — test memory"`（写入记忆索引）
+3. `Read the file code.py`（观察 memory section 是否出现）
+分别推演一下 
+观察重点：
+输出中能看到哪些 section 被加载了（`[assembled] sections: ...` 标签）
+连续对话时，缓存命中显示 `[cache hit]`
+创建 `.memory/MEMORY.md` 文件后，下一轮 memory section 自动加载
+
+然后讲解推演时对于 如果涉及到 下面提到的CC内容要把我的代码和真实cc的两种方式进行对比推演，也就是分别展示我版本和cc版本主要数据结构具体的实际内容 注意cc版本的也要主要数据结构具体的实际内容
+
+cc版本差异如下：
+
+反馈：
+
+经过上一节课的学习，清晰了messages不会＋上system prompt而是一起发给LLM，只是system prompt如果用memory会利用messages强化自身
+```python
+response = client.messages.create(
+            model=MODEL, system=system, messages=messages,
+            tools=TOOLS, max_tokens=8000)
+```
+
+context是啥 是messages和system prompt
+
+回填：
 
 
 S11
