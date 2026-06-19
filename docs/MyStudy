@@ -849,11 +849,18 @@ context: 当前运行状态。有哪些工具、工作目录在哪、有没有 m
 system prompt: 根据 context 拼出来的一段指令，发给模型时放在 system 参数里。
 ```
 
+代码中agent loop（一个用户 turn 结束后）结束和agent loop whiletrue（一个工具调用）结束都会触发update_context
 
+给我介绍一下代码中的update_context()  get_system_prompt  assemble_system_prompt的代码逻辑 1.不要跳过任意一条代码，同时要将其转换为业务逻辑，说明其做了什么事情 2.要理清条件分支
 
+我要你重新推演一下刚刚的三个prompt，就是““
+这次我要你以context的生命周期为主，要讲明白context在什么阶段变化，由什么函数引起变化，变成什么样，最好能讲明白分支条件
 
+这些不太重要的就不太深入cc源码了 搞明白简单版本就可以 看得懂可以 看不懂就算了 
 
 回填：
+
+
 
 S11
 反馈：
