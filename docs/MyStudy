@@ -897,15 +897,31 @@ cc版本差异如下：
 
 
 S12
+S05提到过，这里略
+
+
+
+
 反馈：
 回填：
 
 
 
 S13
-反馈：
-回填：
+仔细分析代码D:\RL\学习记录\modern_agent\my-learn-claude-code\s13_background_tasks\code.py和文档D:\RL\学习记录\modern_agent\my-learn-claude-code\s13_background_tasks\README.md，先给我详细介绍一下daemon 线程是什么
 
+
+我想问在下面的代码中 会把下面的prompt变成怎么样的结构？注意千万不要实际执行 ，我只要你推测 我还要你给我推演一下其它主要数据结构具体的实际内容如messages，日志等 拿
+1. `Run pip list in the background and find all Python files in this directory`
+2. `Run npm install (use run_in_background) and while waiting, read package.json`
+3. `Create a task to setup the project, then run pip list in the background`
+分别推演一下 
+观察重点：慢操作有没有被送到后台？`bg_id` 是否返回？后台通知有没有以 `<task_notification>` 格式注入？
+然后讲解推演时对于 如果涉及到 下面提到的CC内容要把我的代码和真实cc的两种方式进行对比推演，也就是分别展示我版本和cc版本主要数据结构具体的实际内容 注意cc版本的也要主要数据结构具体的实际内容
+
+反馈：
+
+回填：
 
 S14
 反馈：
