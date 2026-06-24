@@ -978,12 +978,21 @@ S16
 观察重点：关机握手是否完整（请求 → 确认 → 关机）？`pending_requests` 的状态是否正确转换？`request_id` 是否在请求和响应之间保持一致？队友 idle 后是否能收到 shutdown_request？
 然后讲解推演时对于 如果涉及到 下面提到的CC内容要把我的代码和真实cc的两种方式进行对比推演，也就是分别展示我版本和cc版本主要数据结构具体的实际内容 注意cc版本的也要主要数据结构具体的实际内容
 反馈：
-我发现对原来代码框架熟悉后，对于新版的代码看着要轻松很多，而且这样更有把握了，现在是看推演然后对应到代码
+我发现对原来代码框架熟悉后，对于新版的代码看着要轻松很多，而且这样更有把握了，现在是看推演然后对应到代码 我感觉搞清楚函数执行时机很重要 
+
+我想到一个关于串并行的问题 有的tool是会挂着等拿到结果 如计算 有的不会 如teammates或者install 就是异步 
+lead执行两个tool，一个tool
+
+
+
+
+
+给我解释下面函数的逻辑consume_lead_inbox match_response _teammate_submit_plan  run_request_shutdown run_request_plan run_review_plan
+查询代码可知，spawn_teammate_thread中的run由于threading.Thread(target=run, daemon=True).start()使得run是异步函数（异步函数是不是代码不用等这个函数执行完return结果就可以往下执行，那回调函数又是什么，promise又是什么？）
+
+==异步执行：泛指“不等这个工作完成，主流程继续走”。线程、事件循环、Promise、回调都可以实现异步执行。==
+
 
 
 
 回填：
-我想到一个关于串并行的问题 有的tool是会挂着等拿到结果 如计算 有的不会 如teammates或者install 就是异步 
-lead执行两个tool，一个tool
-
-查询代码可知，spawn_teammate_thread中的run由于threading.Thread(target=run, daemon=True).start()使得run是异步函数（异步函数是不是代码不用等这个函数执行完return结果就可以往下执行，那回调函数又是什么，promise又是什么？）

@@ -562,7 +562,6 @@ def spawn_teammate_thread(name: str, role: str, prompt: str) -> str:
                         messages.append({"role": "user",
                             "content": "<inbox>" + inbox_json + "</inbox>"})
                         break  # back to LLM turn with new messages
-
             # Execute tool calls
             results = []
             for block in response.content:
@@ -573,7 +572,6 @@ def spawn_teammate_thread(name: str, role: str, prompt: str) -> str:
                                     "tool_use_id": block.id,
                                     "content": str(output)})
             messages.append({"role": "user", "content": results})
-
         # Send final summary to Lead
         summary = "Done."
         for msg in reversed(messages):
