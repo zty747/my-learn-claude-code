@@ -1009,4 +1009,5 @@ Create 3 tasks on the board, then spawn alice and bob. Watch them auto-claim and
 
 反馈：
 如果我完全看懂了还要做图片推演吗？之前我很多是看不懂codex的推演才做代码drawio codex联合推演
-回填：
+
+我注意到teammate引入idle后，一个user turn结束后会自动进入下一个user turn，那我一改如何称teammate这个在agent step，user turn之上的东西 似乎一个user turn可以有多个agent step，一个这个可以有多个user turn
