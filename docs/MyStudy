@@ -1029,9 +1029,34 @@ Create two tasks, then create worktrees for each (bind with task_id). Spawn alic
 上次是teammate大变 这次看readme可以知道变化是Lead 工具+ create_worktree, remove_worktree, keep_worktree (17)
 ，队友工具|8 (s17)|8（bash/read/write 在 worktree cwd 执行）
 感觉pipline没变，重点研究新函数把
+还是先把codex的贴drawio 从熟悉的lead agent loop和teammate run开始
+我觉得抓住lead agent loop/teammate run 的代码流（LLM request respond ，execute tool） 和随之变化的数据结构 messages task mail log很利于熟悉
 
+然后发现drawio中codex推演有一些不懂的地方 问：
+wt_ctx是什么
 给我解释下面函数的逻辑create_worktree, bind_task_to_worktree, remove_worktree, keep_worktree, validate_worktree_name
 
 
+我不太了解git worktree，git status是什么
+s17 中，Alice 和 Bob 都在同一个目录下工作。Alice 的任务是"重构认证模块"，Bob 的任务是"重构 UI 登录页"。
+Alice `write_file("config.py", ...)`。Bob 也 `write_file("config.py", ...)`。两个人改同一个文件，互相覆盖。而且无法干净地回滚——分不清哪些改动是谁的。
+Git worktree 让你在同一仓库中创建多个独立的工作目录，每个有自己的分支。Alice 在 `.worktrees/auth-refactor/` 下工作，Bob 在 `.worktrees/ui-login/` 下工作——互不干扰。
 
+这份代码是不是调用了git worktree来实现分支功能的？git worktree具体做了什么？是创建目录副本吗 这和GitHub创建分支有什么联系区别？git worktree如果两个人改同一个文件在不同分支最后如何合并？
+
+
+在codex推演涉及的新函数的内容和业务逻辑我都一个个贴drawio了，接下来要去代码中找没涉及的函数
+
+
+
+我感觉这个也能体现harness 高智商模型可能会做好划分防止覆盖文件 但是低智商模型就就要这个worktree防止出问题
+
+
+关于合并分支的内容 我就看看
+在教学版代码中 这里在分支修改文件完成任务时，git commit和合并分支到主干是不是全看模型主动调用而不是harness控制？这里有没有合并和commit的工具？merge遇到冲突怎么办？
+cc又是如何做的
+![[Pasted image 20260626152901.png]]
+
+
+![[Pasted image 20260626153739.png]]
 回填：
