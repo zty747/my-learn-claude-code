@@ -1036,6 +1036,7 @@ Create two tasks, then create worktrees for each (bind with task_id). Spawn alic
 wt_ctx是什么
 给我解释下面函数的逻辑create_worktree, bind_task_to_worktree, remove_worktree, keep_worktree, validate_worktree_name
 
+我发现先动手做产物如drawio图和ppt，即使不懂半懂的做，最后会自动去学习哪些关键点 效率高 比如画drawio会画图过程自动去关注那些新工具和主要数据结构不一样的地方，进而去了解工具和引起数据结构变化的代码，进而以此为抓手了解全局 如果不这样 无发抓住新概念的定位就非常乱 知道他们的上下游理解就很好 但是前提是产物本身就是优秀的复习材料，如我觉得我的drawio图非常牛逼 牛逼在哪？
 
 我不太了解git worktree，git status是什么
 s17 中，Alice 和 Bob 都在同一个目录下工作。Alice 的任务是"重构认证模块"，Bob 的任务是"重构 UI 登录页"。
@@ -1060,3 +1061,16 @@ cc又是如何做的
 
 ![[Pasted image 20260626153739.png]]
 回填：
+
+
+
+S19
+仔细分析代码D:\RL\学习记录\modern_agent\my-learn-claude-code\s19_mcp_plugin\code.py和文档D:\RL\学习记录\modern_agent\my-learn-claude-code\s19_mcp_plugin\README.md，
+
+我想问在下面的代码中 会把下面的prompt变成怎么样的结构？注意千万不要实际执行 ，我只要你推测 我还要你给我推演一下其它主要数据结构具体的实际内容如messages,log等 拿
+1. `Connect to the docs MCP server and search for something`
+2. `Connect to the deploy server and trigger a deployment`
+3. `Connect both servers — what tools are now available?`
+观察重点：连接 MCP server 后，工具名是否带 `mcp__docs__` 或 `mcp__deploy__` 前缀？两个 server 的工具是否同时可用？MCP 工具的 description 是否带 (readOnly)/(destructive) 标注？
+
+然后讲解推演时对于 如果涉及到 下面提到的CC内容要把我的代码和真实cc的两种方式进行对比推演，也就是分别展示我版本和cc版本主要数据结构具体的实际内容 注意cc版本的也要主要数据结构具体的实际内容
