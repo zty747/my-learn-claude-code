@@ -1093,3 +1093,19 @@ S19
 我还以为mcp server是服务方如github跑的一个程序 所有人访问它 没想到是本地跑的一个程序 那我很好奇 如GitHub的mcp 肯定还是要本地的mcp server和远程的github服务器交互吧？ 可以用伪代码给我展示一个mcp server的内容吗
 反馈：
 回填：
+S20
+
+仔细分析代码D:\RL\学习记录\modern_agent\my-learn-claude-code\s20_comprehensive\code.py和文档D:\RL\学习记录\modern_agent\my-learn-claude-code\s20_comprehensive\README.md，
+
+我想要你推演个例子把D:\RL\学习记录\modern_agent\my-learn-claude-code\s20_comprehensive\images\system-architecture.svg提到各个状态下引入的机制串起来，如果无法同时触发，可以用假如。。。则。。。来推演(甚至可以改prompt)
+
+反馈：
+我觉得这个日后整理顺便复习比较好
+回填：
+
+
+最后问一下这个项目涉及到的软件工程学的内容，如单例模式什么的
+
+好的 现在我要分析D:\RL\学习记录\modern_agent\my-learn-claude-code\s20_comprehensive\code.py 里面有没有设计到软件工程学的一些范式？如 单例模式 什么的 我也不太能表述清楚 就是能帮助我开发项目时的一些行业里通用的规范，架构
+
+非常满意答案
